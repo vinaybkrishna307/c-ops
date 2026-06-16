@@ -1,197 +1,311 @@
 #!/usr/bin/env node
-
-/**
- * generate-pdf.mjs — HTML → PDF via Playwright
- *
- * Usage:
- *   node career-ops/generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4]
- *
- * Requires: @playwright/test (or playwright) installed.
- * Uses Chromium headless to render the HTML and produce a clean, ATS-parseable PDF.
- */
-
 import { chromium } from 'playwright';
-import { resolve, dirname } from 'path';
 import { readFile } from 'fs/promises';
-import { mkdirSync } from 'fs';
+import { resolve, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
-
+import { writeFile } from 'fs/promises';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Ensure output directory exists (fresh setup)
-mkdirSync(resolve(__dirname, 'output'), { recursive: true });
-
-/**
- * Normalize text for ATS compatibility by converting problematic Unicode.
- *
- * ATS parsers and legacy systems often fail on em-dashes, smart quotes,
- * zero-width characters, and non-breaking spaces. These cause mojibake,
- * parsing errors, or display issues. See issue #1.
- *
- * Only touches body text — preserves CSS, JS, tag attributes, and URLs.
- * Returns { html, replacements } so the caller can log what was changed.
- */
-function normalizeTextForATS(html) {
-  const replacements = {};
-  const bump = (key, n) => { replacements[key] = (replacements[key] || 0) + n; };
-
-  const masks = [];
-  const masked = html.replace(
-    /<(style|script)\b[^>]*>[\s\S]*?<\/\1>/gi,
-    (match) => {
-      const token = `\u0000MASK${masks.length}\u0000`;
-      masks.push(match);
-      return token;
+function parseMd(md) {
+  const lines = md.split('\n');
+  const data = { name: '', subtitle: '', contact: {}, summary: '', experience: [], projects: [], skills: {}, education: [] };
+  let section = null, currentJob = null, currentProject = null;
+  const flushJob = () => { if (currentJob) { data.experience.push(currentJob); currentJob = null; } };
+  const flushProject = () => { if (currentProject) { data.projects.push(currentProject); currentProject = null; } };
+  for (const line of lines) {
+    const t = line.trim();
+    if (/^# /.test(t)) { data.name = t.replace(/^# /, ''); continue; }
+    if (!section && data.name && !/^## /.test(t) && t) {
+      if (t.includes('|') || t.includes('@')) {
+        const parts = t.split('|').map(p => p.trim());
+        let si = 0;
+        if (!parts[0].includes('@') && !parts[0].startsWith('+') && !parts[0].includes('linkedin') && !parts[0].includes('github') && !parts[0].match(/^\w+,/)) { data.subtitle = t; si = 1; }
+        for (let j = si; j < parts.length; j++) {
+          const p = parts[j];
+          if (p.includes('@')) data.contact.email = p;
+          else if (p.startsWith('+') || /^\d/.test(p)) data.contact.phone = p;
+          else if (p.includes('linkedin')) data.contact.linkedin = p;
+          else if (p.includes('github')) data.contact.github = p;
+          else if (p.match(/[A-Z][a-z]+,?\s+India/)) data.contact.location = p;
+          else if (!data.contact.location) data.contact.location = p;
+        }
+      } else if (!data.subtitle) { data.subtitle = t; }
+      continue;
     }
-  );
-
-  let out = '';
-  let i = 0;
-  while (i < masked.length) {
-    const lt = masked.indexOf('<', i);
-    if (lt === -1) { out += sanitizeText(masked.slice(i)); break; }
-    out += sanitizeText(masked.slice(i, lt));
-    const gt = masked.indexOf('>', lt);
-    if (gt === -1) { out += masked.slice(lt); break; }
-    out += masked.slice(lt, gt + 1);
-    i = gt + 1;
+    if (/^## /.test(t)) {
+      flushJob();
+      flushProject();
+      const rawSec = t.replace(/^## /, '').toLowerCase().trim();
+      if (rawSec.includes('skills')) section = 'skills';
+      else if (rawSec.includes('project')) section = 'projects';
+      else if (rawSec.includes('experience')) section = 'experience';
+      else if (rawSec.includes('summary')) section = 'summary';
+      else if (rawSec.includes('education')) section = 'education';
+      else section = rawSec;
+      continue;
+    }
+    if (section === 'experience') {
+      const rm = t.match(/^\*\*(.+?)\*\*\s*\|\s*(.+)/);
+      if (rm) {
+        flushJob();
+        const role = rm[1].trim();
+        const rest = rm[2].trim();
+        const parts = rest.split('|').map(p => p.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          currentJob = { company: parts[0], role: role, period: parts[1], bullets: [] };
+        } else {
+          currentJob = { company: currentJob ? currentJob.company : '', role: role, period: parts[0] || '', bullets: [] };
+        }
+        continue;
+      }
+      if (/^### /.test(t)) {
+        flushJob();
+        currentJob = { company: t.replace(/^### /, ''), role: '', period: '', bullets: [] };
+        continue;
+      }
+      if (currentJob) {
+        if (t.startsWith('- ')) { currentJob.bullets.push(t.replace(/^- /, '')); continue; }
+        if (t.startsWith('▸ ')) { currentJob.bullets.push(t.replace(/^▸ /, '')); continue; }
+        if (t.startsWith('▸')) { currentJob.bullets.push(t.replace(/^▸/, '').trim()); continue; }
+      }
+    }
+    if (section === 'summary' && t) { data.summary += (data.summary ? ' ' : '') + t; continue; }
+    if (section === 'projects') {
+      if (t.startsWith('- **')) {
+        flushProject();
+        const tm = t.match(/^- \*\*(.+?)\*\*\s*(?:\(([^)]+)\))?\s*(?:\|\s*(.+))?/);
+        if (tm) currentProject = { title: tm[1], period: tm[2] || '', link: tm[3] || '', bullets: [] };
+        continue;
+      }
+      if (t.startsWith('- ') && currentProject) { currentProject.bullets.push(t.replace(/^- /, '')); continue; }
+      if (t.startsWith('▸ ') && currentProject) { currentProject.bullets.push(t.replace(/^▸ /, '')); continue; }
+      if (t.startsWith('▸') && currentProject) { currentProject.bullets.push(t.replace(/^▸/, '').trim()); continue; }
+    }
+    if (section === 'skills') { const sm = t.match(/^[-*]?\s*\*\*(.+?):\*\*\s*(.+)/); if (sm) data.skills[sm[1].trim()] = sm[2].trim(); continue; }
+    if (section === 'education') {
+      const em = t.match(/^[-*]?\s*\*\*(.+?)\*\*\s*\|\s*([^|]+)(?:\s*\|\s*(.+))?$/);
+      if (em) {
+        data.education.push({
+          degree: em[1].trim(),
+          org: em[2].trim(),
+          year: em[3] ? em[3].trim() : ''
+        });
+      }
+      continue;
+    }
   }
+  flushJob(); flushProject();
+  return data;
+}
 
-  const restored = out.replace(/\u0000MASK(\d+)\u0000/g, (_, n) => masks[Number(n)]);
-  return { html: restored, replacements };
+const boldify = t => t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
-  function sanitizeText(text) {
-    if (!text) return text;
-    let t = text;
-    t = t.replace(/\u2014/g, () => { bump('em-dash', 1); return '-'; });
-    t = t.replace(/\u2013/g, () => { bump('en-dash', 1); return '-'; });
-    t = t.replace(/[\u201C\u201D\u201E\u201F]/g, () => { bump('smart-double-quote', 1); return '"'; });
-    t = t.replace(/[\u2018\u2019\u201A\u201B]/g, () => { bump('smart-single-quote', 1); return "'"; });
-    t = t.replace(/\u2026/g, () => { bump('ellipsis', 1); return '...'; });
-    t = t.replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, () => { bump('zero-width', 1); return ''; });
-    t = t.replace(/\u00A0/g, () => { bump('nbsp', 1); return ' '; });
-    // Arrows often stripped by PDF text extractors \u2014 replace with ASCII for ATS safety.
-    // Consume surrounding whitespace to avoid double-spacing in output.
-    t = t.replace(/\s*\u2192\s*/g, () => { bump('right-arrow', 1); return ' to '; });
-    t = t.replace(/\s*\u2190\s*/g, () => { bump('left-arrow', 1); return ' from '; });
-    t = t.replace(/\s*[\u2191\u2193]\s*/g, () => { bump('vert-arrow', 1); return ' '; });
-    // Middle dot and bullet glyphs garble in some extractors \u2014 replace with pipe.
-    t = t.replace(/\s*\u00B7\s*/g, () => { bump('middot', 1); return ' | '; });
-    t = t.replace(/\s*\u2022\s*/g, () => { bump('bullet', 1); return ' | '; });
-    // Currency symbols sometimes stripped by font-subsetted PDFs \u2014 spell out
-    // the unambiguous ones. \u00A5 is intentionally NOT converted: it maps to both
-    // Japanese Yen (JPY) and Chinese Yuan (CNY), so any spelled-out code would be
-    // wrong for half of users \u2014 better to leave the glyph than emit bad data.
-    t = t.replace(/\u20AC/g, () => { bump('euro', 1); return 'EUR '; });
-    t = t.replace(/\u00A3/g, () => { bump('pound', 1); return 'GBP '; });
-    return t;
-  }
+function buildExperience(jobs) {
+  return jobs.map(j => `
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title-company">${j.role}<span class="separator">|</span>${j.company}</span>
+        <span class="job-date">${j.period}</span>
+      </div>
+      <ul class="job-bullets">${j.bullets.map(b => `<li>${boldify(b)}</li>`).join('')}</ul>
+    </div>`).join('');
+}
+
+function buildProjects(projects) {
+  return projects.map(p => `
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">${p.title}</span>
+        <span class="job-date">${p.period}</span>
+      </div>
+      ${p.link ? `<a class="project-link" href="https://${p.link}">${p.link}</a>` : ''}
+      <ul class="job-bullets">${p.bullets.map(b => `<li>${boldify(b)}</li>`).join('')}</ul>
+    </div>`).join('');
+}
+
+function buildSkills(skills) {
+  return `<div class="skills-block">${Object.entries(skills).map(([cat, items]) =>
+    `<div class="skill-row"><span class="skill-label">${cat}</span><span class="skill-value">${boldify(items)}</span></div>`
+  ).join('')}</div>`;
+}
+
+function buildEducation(edu) {
+  return edu.map(e => {
+    const orgPart = e.org ? ` — ${e.org}` : '';
+    const yearPart = e.year ? e.year : '';
+    return `
+    <div class="edu-row">
+      <span><span class="edu-degree">${e.degree}</span><span class="edu-school">${orgPart}</span></span>
+      <span class="edu-year">${yearPart}</span>
+    </div>`;
+  }).join('');
+}
+
+function fillTemplate(template, data) {
+  return template
+    .replace('{{NAME}}', data.name)
+    .replace('{{SUBTITLE}}', data.subtitle)
+    .replace('{{EMAIL}}', data.contact.email || '')
+    .replace('{{EMAIL}}', data.contact.email || '')
+    .replace('{{PHONE}}', data.contact.phone || '')
+    .replace('{{LOCATION}}', data.contact.location || '')
+    .replace('{{LINKEDIN_URL}}', `https://${data.contact.linkedin || ''}`)
+    .replace('{{LINKEDIN_DISPLAY}}', data.contact.linkedin || '')
+    .replace('{{PORTFOLIO_URL}}', `https://${data.contact.github || ''}`)
+    .replace('{{PORTFOLIO_DISPLAY}}', data.contact.github || '')
+    .replace('{{SECTION_SUMMARY}}', 'Professional Summary')
+    .replace('{{SUMMARY_TEXT}}', boldify(data.summary))
+    .replace('{{SECTION_SKILLS}}', 'Technical Skills')
+    .replace('{{SKILLS}}', buildSkills(data.skills))
+    .replace('{{SECTION_EXPERIENCE}}', 'Professional Experience')
+    .replace('{{EXPERIENCE}}', buildExperience(data.experience))
+    .replace('{{SECTION_PROJECTS}}', 'Independent Project')
+    .replace('{{PROJECTS}}', buildProjects(data.projects))
+    .replace('{{SECTION_EDUCATION}}', 'Education')
+    .replace('{{EDUCATION}}', buildEducation(data.education));
 }
 
 async function generatePDF() {
   const args = process.argv.slice(2);
-
-  // Parse arguments
-  let inputPath, outputPath, format = 'a4';
-
+  let inputPath, outputPath, templatePath, format = 'a4';
   for (const arg of args) {
-    if (arg.startsWith('--format=')) {
-      format = arg.split('=')[1].toLowerCase();
-    } else if (!inputPath) {
-      inputPath = arg;
-    } else if (!outputPath) {
-      outputPath = arg;
+    if (arg.startsWith('--format=')) format = arg.split('=')[1].toLowerCase();
+    else if (arg.startsWith('--template=')) templatePath = arg.split('=')[1];
+    else if (!inputPath) inputPath = arg;
+    else if (!outputPath) outputPath = arg;
+  }
+  if (!inputPath || !outputPath) { console.error('Usage: node generate-pdf.mjs <input.html|input.md> <output.pdf>'); process.exit(1); }
+  const resolvedInput = resolve(inputPath);
+  const resolvedOutput = resolve(outputPath);
+  const ext = extname(resolvedInput).toLowerCase();
+  let htmlContent;
+  if (ext === '.md') {
+    const mdContent = await readFile(resolvedInput, 'utf-8');
+    const data = parseMd(mdContent);
+
+    // --- Programmatic Validation Against Source of Truth (cv.md) ---
+    const sourceTruthPath = resolve(__dirname, 'cv.md');
+    try {
+      const sourceTruthMd = await readFile(sourceTruthPath, 'utf-8');
+      const sourceTruth = parseMd(sourceTruthMd);
+
+      // 1. Validate Independent Projects Preservation
+      if (sourceTruth.projects && sourceTruth.projects.length > 0) {
+        if (!data.projects || data.projects.length !== sourceTruth.projects.length) {
+          console.error(`❌ Validation Failure: The tailored resume has modified the number of projects. Expected ${sourceTruth.projects.length}, got ${data.projects?.length || 0}.`);
+          process.exit(1);
+        }
+        for (let i = 0; i < sourceTruth.projects.length; i++) {
+          const sp = sourceTruth.projects[i];
+          const dp = data.projects[i];
+          if (dp.title !== sp.title) {
+            console.error(`❌ Validation Failure: Project title mismatch at index ${i}. Expected "${sp.title}", got "${dp.title}".`);
+            process.exit(1);
+          }
+          if (dp.bullets.length !== sp.bullets.length) {
+            console.error(`❌ Validation Failure: Project "${sp.title}" has bullet count mismatch. Expected ${sp.bullets.length} bullets, got ${dp.bullets.length}.`);
+            process.exit(1);
+          }
+          for (let j = 0; j < sp.bullets.length; j++) {
+            const clean = b => b.replace(/\*/g, '').trim();
+            if (clean(dp.bullets[j]) !== clean(sp.bullets[j])) {
+              console.error(`❌ Validation Failure: Project "${sp.title}" bullet ${j + 1} mismatch.\nExpected: "${sp.bullets[j]}"\nGot:      "${dp.bullets[j]}"`);
+              process.exit(1);
+            }
+          }
+        }
+      }
+
+      // 2. Validate Education Entries (degrees must match)
+      if (sourceTruth.education && sourceTruth.education.length > 0) {
+        if (!data.education || data.education.length !== sourceTruth.education.length) {
+          console.error(`❌ Validation Failure: Education entries count mismatch. Expected ${sourceTruth.education.length}, got ${data.education?.length || 0}.`);
+          process.exit(1);
+        }
+        for (let i = 0; i < sourceTruth.education.length; i++) {
+          const se = sourceTruth.education[i];
+          const de = data.education[i];
+          if (de.degree.trim() !== se.degree.trim()) {
+            console.error(`❌ Validation Failure: Education entry ${i + 1} degree mismatch. Expected "${se.degree}", got "${de.degree}".`);
+            process.exit(1);
+          }
+        }
+      }
+    } catch (err) {
+      if (err.message.includes('Validation Failure')) throw err;
+      console.warn("⚠️  Warning: cv.md not found or failed to parse for verification, skipping validation check.");
+    }
+
+    console.log(data.projects);
+    console.log("SUBTITLE:", data.subtitle);
+    const tmplPath = templatePath ? resolve(templatePath) : resolve(__dirname, 'cv-template.html');
+    let template;
+    try { template = await readFile(tmplPath, 'utf-8'); }
+    catch { console.error(`Template not found at ${tmplPath}`); process.exit(1); }
+    htmlContent = fillTemplate(template, data);
+    await writeFile(
+      resolvedOutput.replace('.pdf', '.html'),
+      htmlContent,
+      'utf8'
+    );
+  } else {
+    htmlContent = await readFile(resolvedInput, 'utf-8');
+  }
+
+  // --- Global HTML Output Validation ---
+  const requiredName = "Vinay B";
+  if (!htmlContent.includes(requiredName)) {
+    console.error(`❌ Validation Failure: Candidate name "${requiredName}" is missing or altered in HTML.`);
+    process.exit(1);
+  }
+
+  const exactHeadline = "DevOps Engineer | Platform Engineering | SRE | MLOps | AIOps |";
+  const normStr = s => s.replace(/\s+/g, '').replace(/\*/g, '').toLowerCase();
+  if (!normStr(htmlContent).includes(normStr(exactHeadline))) {
+    console.error(`❌ Validation Failure: Headline must match "${exactHeadline}" exactly.`);
+    process.exit(1);
+  }
+
+  if (!htmlContent.includes("DevOps Engineer")) {
+    console.error("❌ Validation Failure: Job title 'DevOps Engineer' is missing or altered.");
+    process.exit(1);
+  }
+  if (!htmlContent.includes("Software Engineer")) {
+    console.error("❌ Validation Failure: Job title 'Software Engineer' is missing or altered.");
+    process.exit(1);
+  }
+
+  const requiredSkills = ["Cloud & Infra", "Kubernetes", "Observability", "CI/CD & Security", "Languages", "MLOps / AIOps", "AI-Native Tooling"];
+  for (const skill of requiredSkills) {
+    if (!htmlContent.includes(skill)) {
+      console.error(`❌ Validation Failure: Required skill category "${skill}" is missing or altered.`);
+      process.exit(1);
     }
   }
 
-  if (!inputPath || !outputPath) {
-    console.error('Usage: node generate-pdf.mjs <input.html> <output.pdf> [--format=letter|a4]');
+  const projectTitle = "Dual-Engine MLOps + AIOps Platform";
+  if (!htmlContent.includes(projectTitle)) {
+    console.error(`❌ Validation Failure: Project title "${projectTitle}" is missing or altered.`);
     process.exit(1);
   }
 
-  inputPath = resolve(inputPath);
-  outputPath = resolve(outputPath);
-
-  // Validate format
-  const validFormats = ['a4', 'letter'];
-  if (!validFormats.includes(format)) {
-    console.error(`Invalid format "${format}". Use: ${validFormats.join(', ')}`);
+  const jobCount = (htmlContent.match(/class="job"/g) || []).length;
+  if (jobCount < 2) {
+    console.error(`❌ Validation Failure: Experience section has fewer than 2 jobs. Got ${jobCount}.`);
     process.exit(1);
   }
 
-  console.log(`📄 Input:  ${inputPath}`);
-  console.log(`📁 Output: ${outputPath}`);
-  console.log(`📏 Format: ${format.toUpperCase()}`);
-
-  // Read HTML to inject font paths as absolute file:// URLs
-  let html = await readFile(inputPath, 'utf-8');
-
-  // Resolve font paths relative to career-ops/fonts/
-  const fontsDir = resolve(__dirname, 'fonts');
-  html = html.replace(
-    /url\(['"]?\.\/fonts\//g,
-    `url('file://${fontsDir}/`
-  );
-  // Close any unclosed quotes from the replacement (handles all font formats)
-  html = html.replace(
-    /file:\/\/([^'")]+)\.(woff2?|ttf|otf)['"]?\)/g,
-    `file://$1.$2')`
-  );
-
-  // Normalize text for ATS compatibility (issue #1)
-  const normalized = normalizeTextForATS(html);
-  html = normalized.html;
-  const totalReplacements = Object.values(normalized.replacements).reduce((a, b) => a + b, 0);
-  if (totalReplacements > 0) {
-    const breakdown = Object.entries(normalized.replacements).map(([k, v]) => `${k}=${v}`).join(', ');
-    console.log(`🧹 ATS normalization: ${totalReplacements} replacements (${breakdown})`);
+  const projectCount = (htmlContent.match(/class="project"/g) || []).length;
+  if (projectCount < 1) {
+    console.error(`❌ Validation Failure: Projects section has fewer than 1 project. Got ${projectCount}.`);
+    process.exit(1);
   }
 
-  const browser = await chromium.launch({ headless: true });
-  try {
-    const page = await browser.newPage();
-
-    // Set content with file base URL for any relative resources
-    await page.setContent(html, {
-      waitUntil: 'networkidle',
-      baseURL: `file://${dirname(inputPath)}/`,
-    });
-
-    // Wait for fonts to load
-    await page.evaluate(() => document.fonts.ready);
-
-    // Generate PDF
-    const pdfBuffer = await page.pdf({
-      format: format,
-      printBackground: true,
-      margin: {
-        top: '0.6in',
-        right: '0.6in',
-        bottom: '0.6in',
-        left: '0.6in',
-      },
-      preferCSSPageSize: false,
-    });
-
-    // Write PDF
-    const { writeFile } = await import('fs/promises');
-    await writeFile(outputPath, pdfBuffer);
-
-    // Count pages (approximate from PDF structure)
-    const pdfString = pdfBuffer.toString('latin1');
-    const pageCount = (pdfString.match(/\/Type\s*\/Page[^s]/g) || []).length;
-
-    console.log(`✅ PDF generated: ${outputPath}`);
-    console.log(`📊 Pages: ${pageCount}`);
-    console.log(`📦 Size: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);
-
-    return { outputPath, pageCount, size: pdfBuffer.length };
-  } finally {
-    await browser.close();
-  }
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: 'networkidle' });
+  await page.pdf({ path: resolvedOutput, format: format === 'letter' ? 'Letter' : 'A4', printBackground: true, margin: { top: '0mm', bottom: '0mm', left: '0mm', right: '0mm' } });
+  await browser.close();
+  console.log(`PDF generated: ${resolvedOutput}`);
 }
-
-generatePDF().catch((err) => {
-  console.error('❌ PDF generation failed:', err.message);
-  process.exit(1);
-});
+generatePDF().catch(err => { console.error('Error:', err); process.exit(1); });

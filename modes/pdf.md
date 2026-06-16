@@ -15,10 +15,12 @@
 9. Reorder experience bullets by JD relevance
 10. Build competency grid from JD requirements (6-8 keyword phrases)
 11. Inject keywords naturally into existing achievements (NEVER invent)
-12. Generate full HTML from template + personalized content
-13. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
-14. Write HTML to `/tmp/cv-{candidate}-{company}.html`
-15. Execute: `node generate-pdf.mjs /tmp/cv-{candidate}-{company}.html output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf --format={letter|a4}`
+12. Generate the tailored markdown content (following the verbatim matching and preservation rules).
+13. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`.
+14. Write the tailored markdown to a file named `reports/{REPORT_NUM}-{candidate}-{company-slug}-cv.md` (or similar).
+15. Compile the HTML and PDF by running the compiler script:
+    `node generate-pdf.mjs reports/{REPORT_NUM}-{candidate}-{company-slug}-cv.md reports/{REPORT_NUM}-{candidate}-{company-slug}-cv.pdf --template=templates/cv-template.html --format={letter|a4}`
+    (For the current **Philips SRE** role, the output file names must be specifically designated as version 5: **`output/cv-philips-sre-v5.pdf`** and **`output/cv-philips-sre-v5.html`** (rather than default placeholders). This allows comparison with the older `v4` version.)
 16. Report: PDF path, number of pages, keyword coverage %
 
 ## ATS Rules (clean parsing)
@@ -52,7 +54,22 @@
 6. Education & Certifications
 7. Skills (languages + technical)
 
-## Keyword injection strategy (ethical, truth-based)
+## Resume Tailoring and Keyword Injection Strategy (Verbatim Match & Drift Limits)
+
+- **85% Verbatim Match / 15% Drift Rule (MANDATORY)**: The generated resume must match at least 85% of `cv.md` verbatim. Drift is strictly capped at a maximum of 15%.
+- **Technical Skills Preservation**: You are **NEVER** allowed to remove any skill or section from the Technical Skills list in `cv.md`. You may only *add* a few specific skills if they can be easily learned/acquired by the candidate within a single day. All skill categories (Languages, Cloud & Infra, Kubernetes, Observability, CI/CD & Security, MLOps / AIOps, AI-Native Tooling) must be preserved exactly as named in `cv.md` — never rename or collapse them (e.g. do not rename "Cloud & Infra" to "Cloud" or "Kubernetes" to "Tools").
+- **Independent Projects Preservation**: You are **NEVER** allowed to remove, omit, shorten, or reword any project or bullet point from the Independent Projects section of `cv.md`. All projects and their bullets must be preserved in full verbatim, word-for-word, including all sub-bullets and metrics.
+- **Education Preservation**: You are **NEVER** allowed to remove, omit, or alter any part of the Education details from `cv.md`. This includes the degree, the school/organization, and the graduation years/dates. Copy them exactly verbatim (e.g. including `| 2015 – 2019`).
+- **Experience Customization & Proactive Enrichment**: You may *add* minor enhancements or better phrasing to the experience bullets. If the JD requests standard operational tasks (e.g., *on-call rotation*, *incident response*, *reverse proxies*, *networking/CDNs*) and the candidate has matching tools in `cv.md` (e.g., `Prometheus/AlertManager`, `Nginx`, `Route53`), you **SHOULD** proactively inject 1-2 brief bullet points detailing these standard duties (e.g., *"Managed incident response for production infrastructure using Prometheus/AlertManager"* or *"Configured Nginx as a reverse proxy/load balancer to secure and optimize backend microservices traffic"*).
+- **Ethical, Truth-Based Rewriting**: Only reword real experience using the exact JD vocabulary. **NEVER** modify `cv.md` itself or invent achievements/metrics.
+- **Immutable Fields (Hard Rule)**: The following fields must be copied verbatim from `cv.md`. Do not rewrite, optimize, infer, enhance, modernize, or adapt them. Do NOT add any markdown formatting (such as wrapping them in asterisks `**` or other tags) to these fields in the output markdown. They must match `cv.md` exactly:
+  - Candidate Name (e.g. "Vinay B")
+  - Resume Headline (e.g. "DevOps Engineer | Platform Engineering | SRE | MLOps | AIOps |")
+  - Company Names
+  - Job Titles (e.g. "DevOps Engineer" at Volt Security must remain exactly "DevOps Engineer", never "SRE / DevOps Engineer" or "DevOps Engineer (SRE)")
+  - Project Titles
+  - Education Details
+- **User Confirmation Required**: Before writing any HTML or compiling the PDF, you **MUST** show the proposed changes (customization plan) and the mandatory validation checklist to the user, and ask for their explicit confirmation to proceed. Do not generate the PDF until the user confirms.
 
 Examples of legitimate reformulation:
 - JD says "RAG pipelines" and CV says "LLM workflows with retrieval" → change to "RAG pipeline design and LLM orchestration workflows"

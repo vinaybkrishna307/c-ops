@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinay B — CV</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    body {
+      font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #1a1a1a;
+      background: #ffffff;
+      padding: 0.45in 0.55in 0.35in;
+      margin: 0;
+    }
+
+    .page { width: 100%; max-width: 210mm; margin: 0 auto; }
+
+    /* HEADER */
+    .header { margin-bottom: 10px; }
+
+    .header-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #0f0f0f;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 5px;
+    }
+
+    .header-title {
+      font-size: 13.5px;
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 0.01em;
+      margin-bottom: 8px;
+    }
+
+    .header-contact {
+      font-size: 11px;
+      color: #555;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .header-contact span, .header-contact a { color: #555; text-decoration: none; }
+    .header-contact .dot { margin: 0 5px; color: #999; }
+
+    /* DIVIDERS */
+    .divider { border: none; border-top: 1.5px solid #1a1a1a; margin: 8px 0 10px; }
+    .thin-rule { border: none; border-top: 0.75px solid #d0d0d0; margin: 8px 0 10px; }
+
+    /* SECTION */
+    .section { margin-bottom: 16px; }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    /* SUMMARY */
+    .summary { font-size: 11.5px; line-height: 1.55; color: #2a2a2a; }
+
+    /* SKILLS */
+    .skills-block { display: grid; gap: 2px; }
+
+    .skill-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      align-items: baseline;
+    }
+
+    .skill-label { font-weight: 600; color: #1a1a1a; }
+    .skill-value { color: #3a3a3a; }
+
+    /* EXPERIENCE */
+    .job { margin-bottom: 14px; break-inside: avoid; page-break-inside: avoid; }
+
+    .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+
+    .job-title-company { font-size: 12.5px; font-weight: 600; color: #1a1a1a; }
+    .job-title-company .separator { font-weight: 400; color: #666; margin: 0 3px; }
+
+    .job-date { font-size: 10.5px; color: #555; white-space: nowrap; }
+    .job-location { font-size: 9.5px; color: #888; margin-bottom: 4px; }
+
+    .job-bullets { list-style: none; padding: 0; margin: 0; }
+
+    .job-bullets li {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #2a2a2a;
+      padding-left: 11px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+
+    .job-bullets li::before {
+      content: "▸"; position: absolute; left: 0; color: #888; font-size: 7.5px; top: 2px;
+    }
+
+    /* PROJECT */
+    .project { break-inside: avoid; page-break-inside: avoid; margin-bottom: 10px; }
+
+    .project-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+    .project-name { font-size: 12.5px; font-weight: 700; color: #1a1a1a; }
+
+    .project-link { font-size: 10.5px; color: #777; text-decoration: none; display: block; margin-top: 1px; margin-bottom: 4px; }
+
+    /* EDUCATION */
+    .edu-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 11.5px; }
+    .edu-degree { font-weight: 600; color: #1a1a1a; }
+    .edu-school { font-weight: 400; color: #444; }
+    .edu-year { font-size: 11.5px; color: #555; white-space: nowrap; }
+
+    /* EXTRA / ADDITIONAL */
+    .extra-text { font-size: 11.5px; line-height: 1.5; color: #2a2a2a; }
+
+    @media print {
+      body { padding: 0.3in 0.45in 0.3in 0.45in; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-name">Vinay B</div>
+    <div class="header-title">DevOps Engineer | Platform Engineering | SRE | MLOps | AIOps |</div>
+    <div class="header-contact">
+      <a href="mailto:vinaybkrishna10@gmail.com">vinaybkrishna10@gmail.com</a>
+      <span class="dot">·</span>
+      <span>+91 8660953284</span>
+      <span class="dot">·</span>
+      <span>Bengaluru, India</span>
+      <span class="dot">·</span>
+      <a href="https://github.com/Vinaycicdops">github.com/Vinaycicdops</a>
+      <span class="dot">·</span>
+      <a href="https://linkedin.com/in/vinaybkrishna">linkedin.com/in/vinaybkrishna</a>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PROFESSIONAL SUMMARY -->
+  <div class="section">
+    <div class="section-title">Professional Summary</div>
+    <div class="summary">DevOps / SRE Engineer with 3.5+ years of production experience designing self-healing, highly available cloud platforms on AWS. Specialized in high-concurrency environments (25k+ RPS, 99.99% uptime), <strong>orchestrating both EKS and ECS (Fargate/EC2)</strong>, and streamlining CI/CD with GitOps and <strong>AWS CodePipeline</strong>. Expert in <strong>Infrastructure as Code (Terraform)</strong>, comprehensive networking (VPC, VPN, CDN, DNS), and RDS optimization. Built a dual-engine anomaly detection platform for automated drift-triggered retraining via Kubeflow Pipelines.</div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- TECHNICAL SKILLS -->
+  <div class="section">
+    <div class="section-title">Technical Skills</div>
+    <div class="skills-block"><div class="skill-row"><span class="skill-label">Cloud & Infra</span><span class="skill-value">AWS (<strong>ECS, EKS, EC2, RDS, S3, VPC, VPN, CloudFront, Route53, ALB/NLB, KMS, ASG</strong>), Terraform, Ansible, Vault, Docker, Nginx, WAF</span></div><div class="skill-row"><span class="skill-label">Kubernetes & Containers</span><span class="skill-value"><strong>EKS, ECS</strong>, Helm + Kustomize, ArgoCD, HPA/VPA, RBAC, Istio</span></div><div class="skill-row"><span class="skill-label">Observability & APM</span><span class="skill-value"><strong>Datadog (APM, RUM)</strong>, Prometheus, Grafana, Loki, ELK Stack, OpenTelemetry, CloudWatch</span></div><div class="skill-row"><span class="skill-label">CI/CD & Security</span><span class="skill-value"><strong>AWS CodePipeline</strong>, GitHub Actions, GitLab CI, GitOps, Argo Workflows, CodeQL, Trivy, SonarQube</span></div><div class="skill-row"><span class="skill-label">Languages</span><span class="skill-value">Python (ML/Data Engineering), Bash, PostgreSQL, MySQL, MongoDB, Redis</span></div><div class="skill-row"><span class="skill-label">MLOps / AIOps</span><span class="skill-value">Kubeflow Pipelines (KFP v2), MLflow, DVC, KServe, Evidently AI</span></div></div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- PROFESSIONAL EXPERIENCE -->
+  <div class="section">
+    <div class="section-title">Professional Experience</div>
+    
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title-company">DevOps Engineer<span class="separator">|</span>Volt Security Pvt Ltd - Bengaluru, India</span>
+        <span class="job-date">Dec 2023 – Jan 2026</span>
+      </div>
+      <ul class="job-bullets"><li>Administered production <strong>EKS and ECS</strong> clusters achieving 99.99% uptime across 8 critical microservices handling <strong>25k+ requests per second</strong>.</li><li>Provisioned highly available AWS infrastructure (<strong>EKS, ECS, RDS, VPC</strong>) using Terraform modules — reduced provisioning time from days to under <strong>10 minutes</strong>.</li><li>Designed and maintained <strong>CI/CD pipelines using AWS CodePipeline</strong>, GitHub Actions, and GitLab CI, cutting deployment time by <strong>40%</strong>.</li><li>Managed <strong>networking infrastructure</strong> including VPC peering, VPN configurations, and <strong>DNS/CDN (CloudFront/Route53)</strong> for optimal global availability and performance.</li><li>Optimized <strong>AWS RDS (PostgreSQL/MySQL)</strong> for cost and performance, implementing automated backups and monitoring.</li><li>Built <strong>end-to-end observability stack</strong> (Datadog APM/RUM, Prometheus, Grafana, Loki) reducing MTTR to under 55 minutes.</li><li>Configured <strong>Nginx reverse proxies</strong> and load balancers to secure and optimize backend traffic in a fast-paced SaaS environment.</li><li>Led DevSecOps initiatives: least-privilege IAM, KMS encryption, and Trivy scanning for proactive security and compliance.</li></ul>
+    </div>
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title-company">Software Engineer<span class="separator">|</span>Cognitive Clouds - Bengaluru, India</span>
+        <span class="job-date">Jan 2021 – Aug 2022</span>
+      </div>
+      <ul class="job-bullets"><li>Engineered multi-stage Dockerfiles <strong>reducing image sizes by ~60%</strong> and significantly improving build speeds across containerized microservices.</li><li>Built automated CI/CD workflows and managed deployments in an <strong>Agile environment</strong>, reducing release cycle time by 20%.</li><li>Collaborated across teams to troubleshoot infrastructure bottlenecks and optimize application performance.</li></ul>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- PROJECTS -->
+  <div class="section">
+    <div class="section-title">Independent Project</div>
+    
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Dual-Engine MLOps + AIOps Platform</span>
+        <span class="job-date">Jan 2024 – Present</span>
+      </div>
+      <a class="project-link" href="https://github.com/Vinaycicdops/project_1">github.com/Vinaycicdops/project_1</a>
+      <ul class="job-bullets"><li>AIOps Engine: <strong>Ensemble anomaly detector (Isolation Forest + LSTM Autoencoder)</strong> monitoring 8+ Prometheus metrics; detects anomalies within 30–40 seconds with Slack notification.</li><li>MLOps Pipeline: <strong>6-component KFP v2 workflow</strong> with MLflow tracking and DVC versioning.</li><li>Drift Monitoring: Integrated Evidently AI for drift detection; FastAPI webhook auto-triggers Kubeflow Pipeline retraining on drift signal.</li></ul>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">Education</div>
+    
+    <div class="edu-row">
+      <span><span class="edu-degree">B.E. Computer Science</span><span class="edu-school"> — KSSEM, Bengaluru</span></span>
+      <span class="edu-year">2015 – 2019</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
+
+<!--follow rules and dont drift too much from cv.md file 15% drfit is allowed and should make sense-->

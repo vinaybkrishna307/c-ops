@@ -280,94 +280,330 @@ next_action: "{one concrete next step}"
 (15-20 keywords del JD para ATS)
 ```
 
-### Paso 4 — Generar PDF (configurable)
+Paso 4 — Generar PDF (configurable)
 
-**Gate:** Read `config/profile.yml` → `auto_pdf_score_threshold`. If the key is absent, default to **`3.0`** (the original gate of Path A). This step ONLY runs when the score from Paso 2 is **≥ the resolved threshold**. For everything below it, skip this entire step — the user can generate a tailored PDF on demand later via `/career-ops pdf {company-slug}` using the report from Paso 3 as input.
+If score ≥ threshold, generate the tailored PDF.
 
-**Rationale:** Generating a tailored PDF costs ~30–60s per offer (Playwright launch + HTML render) and produces files that often go unused — most roles score 2.x/3.x and never reach application. The `3.0` default matches Path A's original behavior; raise `auto_pdf_score_threshold` (e.g. `4.0`) to pre-generate fewer PDFs, or set `0` to generate one for every offer. Both Path A (`/career-ops pipeline`) and Path B (this batch worker) read the same config key for consistency.
+Resume Preservation Rules (HARD RULES)
 
-**If score < threshold:**
-- Skip steps 1–14 below.
-- In the report header use: `**PDF:** not generated — run /career-ops pdf {company-slug} to create on demand`.
-- In Paso 5 (tracker line) use `pdf_emoji` = `❌`.
-- In Paso 6 (output JSON) set `"pdf": null`.
-- Done — move to Paso 5.
+cv.md is the source of truth.
 
-**If score ≥ threshold**, generate the tailored PDF:
+Identity is fixed.
+Emphasis is dynamic.
 
-1. Lee `cv.md` + `i18n.ts`
-2. Extrae 15-20 keywords del JD
-3. Detecta idioma del JD → idioma del CV (EN default)
-4. Detecta ubicación empresa → formato papel: US/Canada → `letter`, resto → `a4`
-5. Detecta arquetipo → adapta framing
-6. Reescribe Professional Summary inyectando keywords
-7. Selecciona top 3-4 proyectos más relevantes
-8. Reordena bullets de experiencia por relevancia al JD
-9. Construye competency grid (6-8 keyword phrases)
-10. Inyecta keywords en logros existentes (**NUNCA inventa**)
-11. Genera HTML completo desde template (lee `templates/cv-template.html`)
-12. Escribe HTML a `/tmp/cv-candidate-{company-slug}.html`
-13. Ejecuta:
-```bash
-node generate-pdf.mjs \
-  /tmp/cv-candidate-{company-slug}.html \
-  output/cv-candidate-{company-slug}-{{DATE}}.pdf \
-  --format={letter|a4}
-```
-14. Reporta: ruta PDF, nº páginas, % cobertura keywords
+The purpose of tailoring is to improve relevance, not change identity.
 
-On success, in Paso 5 use `pdf_emoji` = `✅` and in Paso 6 set `"pdf"` to the output path.
+The generated resume should look like the candidate tailored their resume, not like a different person wrote a new one.
 
-**Reglas ATS:**
-- Single-column (sin sidebars)
-- Headers estándar: "Professional Summary", "Work Experience", "Education", "Skills", "Certifications", "Projects"
-- Sin texto en imágenes/SVGs
-- Sin info crítica en headers/footers
-- UTF-8, texto seleccionable
-- Keywords distribuidas: Summary (top 5), primer bullet de cada rol, Skills section
+---
 
-**Diseño:**
-- Fonts: Space Grotesk (headings, 600-700) + DM Sans (body, 400-500)
-- Fonts self-hosted: `fonts/`
-- Header: Space Grotesk 24px bold + gradiente cyan→purple 2px + contacto
-- Section headers: Space Grotesk 13px uppercase, color cyan `hsl(187,74%,32%)`
-- Body: DM Sans 11px, line-height 1.5
-- Company names: purple `hsl(270,70%,45%)`
-- Márgenes: 0.6in
-- Background: blanco
+Immutable Fields (Hard Rule)
 
-**Estrategia keyword injection (ético):**
-- Reformular experiencia real con vocabulario exacto del JD
-- NUNCA añadir skills the candidate doesn't have
-- Ejemplo: JD dice "RAG pipelines" y CV dice "LLM workflows with retrieval" → "RAG pipeline design and LLM orchestration workflows"
+The following fields must be copied verbatim from cv.md.
 
-**Template placeholders (en cv-template.html):**
+Do not rewrite, optimize, reformat, infer, modernize, enhance, adapt, or rename them. Do NOT add any markdown formatting (such as wrapping them in asterisks `**` or other tags) to these fields in the output markdown. They must match cv.md exactly:
 
-| Placeholder | Contenido |
-|-------------|-----------|
-| `{{LANG}}` | `en` o `es` |
-| `{{PAGE_WIDTH}}` | `8.5in` (letter) o `210mm` (A4) |
-| `{{NAME}}` | (from profile.yml) |
-| `{{EMAIL}}` | (from profile.yml) |
-| `{{LINKEDIN_URL}}` | (from profile.yml) |
-| `{{LINKEDIN_DISPLAY}}` | (from profile.yml) |
-| `{{PORTFOLIO_URL}}` | (from profile.yml) |
-| `{{PORTFOLIO_DISPLAY}}` | (from profile.yml) |
-| `{{LOCATION}}` | (from profile.yml) |
-| `{{SECTION_SUMMARY}}` | Professional Summary / Resumen Profesional |
-| `{{SUMMARY_TEXT}}` | Summary personalizado con keywords |
-| `{{SECTION_COMPETENCIES}}` | Core Competencies / Competencias Core |
-| `{{COMPETENCIES}}` | `<span class="competency-tag">keyword</span>` × 6-8 |
-| `{{SECTION_EXPERIENCE}}` | Work Experience / Experiencia Laboral |
-| `{{EXPERIENCE}}` | HTML de cada trabajo con bullets reordenados |
-| `{{SECTION_PROJECTS}}` | Projects / Proyectos |
-| `{{PROJECTS}}` | HTML de top 3-4 proyectos |
-| `{{SECTION_EDUCATION}}` | Education / Formación |
-| `{{EDUCATION}}` | HTML de educación |
-| `{{SECTION_CERTIFICATIONS}}` | Certifications / Certificaciones |
-| `{{CERTIFICATIONS}}` | HTML de certificaciones |
-| `{{SECTION_SKILLS}}` | Skills / Competencias |
-| `{{SKILLS}}` | HTML de skills |
+* Candidate Name
+* Resume Headline
+* Company Names
+* Job Titles
+* Project Titles and ALL their bullet points verbatim (do not shorten, reword, or omit any bullets)
+* Education Details verbatim (including degree, school name, and graduation years/dates like "| 2015 – 2019")
+* Dates
+* Metrics
+
+Examples:
+
+Headline:
+DevOps Engineer | Platform Engineering | SRE | MLOps | AIOps |
+
+Must never become:
+* **DevOps Engineer | Platform Engineering | SRE | MLOps | AIOps |**
+* **Site Reliability Engineer | Platform Engineering | MLOps**
+* *AI-Native Platform Engineer*
+* *Senior SRE*
+* *Platform Engineer*
+* *Cloud Native Engineer*
+
+Job Titles:
+* DevOps Engineer
+* Software Engineer
+
+Must never become:
+* **SRE / DevOps Engineer**
+* **DevOps Engineer** (with asterisks)
+* *Senior DevOps Engineer*
+* *Platform Engineer*
+* *Site Reliability Engineer*
+
+Project Titles:
+* Dual-Engine MLOps + AIOps Platform
+
+Must never become:
+* **Dual-Engine MLOps + AIOps Platform** (with asterisks)
+* *Autonomous AIOps Platform*
+* *AI-Native Operations Platform*
+* *Intelligent SRE Platform*
+
+---
+
+Allowed
+
+* Reorder existing bullets
+* Reorder existing projects
+* Reorder existing skills
+* Inject truthful JD keywords into existing content
+* Reorder technologies within existing skill categories
+
+Forbidden
+
+* New sections
+* Core Competencies
+* Competency Grids
+* Competency Tags
+* Expertise Matrices
+* Highlights Sections
+* Key Achievements Sections
+* Certifications Sections unless present in cv.md
+* New responsibilities
+* New accomplishments
+* New projects
+* New role titles
+* New company-stage claims
+* Founding-team claims
+* Startup ownership claims
+* Product ownership claims
+* Customer onboarding ownership claims
+* Seniority inflation
+* Rewriting immutable fields
+
+If information is not explicitly present in cv.md, do not add it.
+
+---
+
+Header Rules
+
+Header title (headline) must be copied verbatim from cv.md.
+
+Never rewrite or reformat the title based on:
+* archetype
+* company
+* JD language
+* inferred seniority
+* company domain
+* hiring manager wording
+* markdown formatting like asterisks (`**`)
+
+It must remain plain text, matching the original headline exactly.
+
+Role archetype is used only for:
+
+* keyword prioritization
+* bullet ordering
+* project ordering
+* skills ordering
+
+Never display archetype information in the PDF.
+
+---
+
+Summary Rules
+
+Preserve the original summary structure.
+
+Allowed:
+
+* Add JD-relevant keywords already supported by cv.md
+* Reorder existing phrases
+* Improve ATS matching
+
+Forbidden:
+
+* Adding new experience
+* Adding new ownership claims
+* Adding new seniority claims
+* Adding new responsibilities
+* Founding-team language
+* Startup language
+* Customer onboarding claims
+* Product ownership claims
+* Agentic AI claims unless present in cv.md
+* Platform engineer claims unless present in cv.md
+* AI architect claims unless present in cv.md
+
+The summary should read as the same summary with enhanced keyword coverage.
+
+---
+
+Skills Rules
+
+All skill categories from cv.md must be preserved exactly as named in cv.md (e.g. "Cloud & Infra" must remain "Cloud & Infra" and NOT be renamed to "Cloud"; "Kubernetes" must remain "Kubernetes" and NOT be renamed to "Tools").
+
+All technologies from cv.md must be preserved. Do not remove any technology.
+
+Do not:
+
+* summarize skills
+* merge categories
+* collapse categories
+* rename categories
+* remove technologies
+
+Allowed:
+
+* reorder categories
+* reorder technologies within categories
+
+Example:
+
+Cloud & Infra
+Kubernetes
+MLOps / AIOps
+CI/CD & Security
+Observability
+Languages
+
+must all remain present if present in cv.md.
+
+---
+
+Section Order Rules
+
+Use the exact section order from cv.md:
+
+1. Header
+2. Professional Summary
+3. Technical Skills
+4. Professional Experience
+5. Projects
+6. Education
+
+Do not insert additional sections.
+
+---
+
+JD Relevance Ranking
+
+Extract 15-20 keywords from the JD.
+
+For Experience:
+
+1. Score each bullet against the JD keywords.
+2. Sort bullets by relevance.
+3. Preserve all bullets.
+
+Do not remove bullets.
+
+Do not create bullets.
+
+For Skills:
+
+1. Score categories against JD keywords.
+2. Reorder categories by relevance.
+3. Preserve all categories and technologies.
+
+For Projects:
+
+1. Score projects against JD keywords.
+2. Reorder by relevance.
+3. Preserve all projects.
+
+---
+
+Project Rules
+
+Preserve all projects from cv.md.
+
+If multiple projects exist:
+
+* reorder by relevance
+
+Do not:
+
+* rename projects
+* remove projects
+* create projects
+* modify project titles
+* remove project bullets
+
+---
+
+Experience Rules
+
+All experience bullets must remain.
+
+Allowed:
+
+* reorder bullets
+
+Forbidden:
+
+* deleting bullets
+* creating bullets
+* inventing metrics
+* inventing responsibilities
+* inventing technologies
+
+---
+
+PDF Generation Pipeline
+
+1. Read cv.md
+2. Read JD
+3. Extract keywords
+4. Detect archetype
+5. Reorder bullets by relevance
+6. Reorder projects by relevance
+7. Reorder skills by relevance
+8. Inject truthful keywords into existing content
+9. Write the tailored markdown content to `reports/cv-candidate-${company-slug}.md`.
+10. Compile the HTML and PDF by running:
+    `node generate-pdf.mjs reports/cv-candidate-${company-slug}.md reports/cv-candidate-${company-slug}-{{DATE}}.pdf --template=templates/cv-template.html`
+11. Verify that the output PDF was successfully generated.
+
+---
+
+Validation
+
+Verify:
+
+* Headline unchanged
+* Company names unchanged
+* Job titles unchanged
+* Project titles unchanged
+* Dates unchanged
+* Metrics unchanged
+* All skill categories preserved
+* All technologies preserved
+* All projects preserved
+* All project bullets preserved
+* All experience bullets preserved
+* No Core Competencies section
+* No Competency Grid section
+* No Competency Tags section
+* No Highlights section
+* No Key Achievements section
+* No Certifications section unless present in cv.md
+
+Validation Failure Conditions
+
+Fail generation if:
+
+* Any immutable field changes
+* Any skill category is missing
+* Any technology is missing
+* Any project is missing
+* Any project title changes
+* Any experience bullet is missing
+* Any metric changes
+* Any new section appears
+
+If validation fails:
+
+Stop.
+Regenerate.
+Do not produce the PDF until validation passes.
+
 
 ### Paso 5 — Tracker Line
 

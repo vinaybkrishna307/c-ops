@@ -90,14 +90,20 @@ After detecting archetype, read `modes/_profile.md` for the user's specific fram
 
 ### NEVER
 
-1. Invent experience or metrics
-2. Modify cv.md or portfolio files
-3. Submit applications on behalf of the candidate
-4. Share phone number in generated messages
-5. Recommend comp below market rate
-6. Generate a PDF without reading the JD first
-7. Use corporate-speak
-8. Ignore the tracker (every evaluated offer gets registered)
+1. Invent experience or metrics.
+2. Modify `cv.md` or portfolio files.
+3. Submit applications on behalf of the candidate.
+4. Share phone number in generated messages.
+5. Recommend comp below market rate.
+6. Generate a PDF without reading the JD first.
+7. Use corporate-speak.
+8. Ignore the tracker (every evaluated offer gets registered).
+9. Remove any skill or section from the Technical Skills list in `cv.md`.
+10. Allow the generated resume to drift more than 15% from the original `cv.md` (the resume must match at least 85% of `cv.md` verbatim).
+11. Write the customized resume HTML or compile the PDF without first presenting the proposed changes/validation list and obtaining explicit user confirmation.
+12. Remove, omit, shorten, or reword any project or bullet point from the Independent Projects section of `cv.md` (all projects and their bullets must be preserved in full verbatim, word-for-word, including all sub-bullets and metrics).
+13. Omit proactive experience enrichment of standard operational duties (like Nginx reverse proxying or Prometheus/AlertManager incident response) when the JD asks for them and the candidate's skills contain the matching tools.
+14. Remove, omit, shorten, or alter any part of the Education details from `cv.md`, including the degree, school/organization name, and graduation years/dates. They must be copied exactly verbatim.
 
 ### ALWAYS
 
