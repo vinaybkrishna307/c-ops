@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinay B — CV</title>
+  <style>
+    @font-face {
+      font-family: 'Space Grotesk';
+      src: url('./fonts/space-grotesk-latin.woff2') format('woff2');
+      font-weight: 300 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('./fonts/dm-sans-latin.woff2') format('woff2');
+      font-weight: 100 1000;
+      font-style: normal;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    body {
+      font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #1a1a1a;
+      background: #ffffff;
+      padding: 0.42in 0.52in 0.3in;
+      margin: 0;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 210mm;
+      margin: 0 auto;
+    }
+
+    /* ── HEADER ── */
+    .header { margin-bottom: 8px; }
+
+    .header-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #0f0f0f;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+
+    .header-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 0.01em;
+      margin-bottom: 5px;
+    }
+
+    .header-contact {
+      font-size: 11px;
+      color: #555;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+
+    .header-contact span,
+    .header-contact a { color: #555; text-decoration: none; }
+
+    .header-contact .dot { margin: 0 5px; color: #999; }
+
+    /* ── DIVIDERS ── */
+    .divider {
+      border: none;
+      border-top: 1.5px solid #1a1a1a;
+      margin: 10px 0 12px;
+    }
+
+    .thin-rule {
+      border: none;
+      border-top: 0.75px solid #d0d0d0;
+      margin: 10px 0 12px;
+    }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 12px; }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      margin-bottom: 5px;
+    }
+
+    /* ── SUMMARY ── */
+    .summary {
+      font-size: 11px;
+      line-height: 1.55;
+      color: #2a2a2a;
+    }
+
+    /* ── SKILLS ── */
+    .skills-block { display: grid; gap: 2px; }
+
+    .skill-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 6px;
+      font-size: 11.5px;
+      line-height: 1.45;
+      align-items: baseline;
+    }
+
+    .skill-label { font-weight: 600; color: #1a1a1a; }
+    .skill-value { color: #3a3a3a; }
+
+    /* ── EXPERIENCE ── */
+    .job {
+      margin-bottom: 12px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1px;
+    }
+
+    .job-title-company {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .job-title-company .separator {
+      font-weight: 400;
+      color: #666;
+      margin: 0 3px;
+    }
+
+    .job-date {
+      font-size: 10px;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    .job-location {
+      font-size: 9px;
+      color: #888;
+      margin-bottom: 3px;
+    }
+
+    .job-bullets { list-style: none; padding: 0; margin: 0; }
+
+    .job-bullets li {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #2a2a2a;
+      padding-left: 12px;
+      position: relative;
+      margin-bottom: 2px;
+    }
+
+    .job-bullets li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #888;
+      font-size: 8px;
+      top: 2px;
+    }
+
+    /* ── PROJECT ── */
+    .project {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      margin-bottom: 3px;
+    }
+
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1px;
+    }
+
+    .project-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .project-link {
+      font-size: 10px;
+      color: #777;
+      text-decoration: none;
+      display: block;
+      margin-top: 1px;
+      margin-bottom: 3px;
+    }
+
+    /* ── EDUCATION ── */
+    .edu-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 10px;
+    }
+
+    .edu-degree { font-weight: 600; color: #1a1a1a; }
+    .edu-school { font-weight: 400; color: #444; }
+    .edu-year { font-size: 10px; color: #555; white-space: nowrap; }
+
+    /* ── PRINT ── */
+    @media print {
+      body { padding: 0.42in 0.52in 0.45in; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-name">Vinay B</div>
+    <div class="header-title">DevOps Engineer | Platform Engineering | MLOps | AIOps | SRE</div>
+    <div class="header-contact">
+      <a href="mailto:vinaybkrishna10@gmail.com">vinaybkrishna10@gmail.com</a>
+      <span class="dot">·</span>
+      <span>+91 8660953284</span>
+      <span class="dot">·</span>
+      <span>Bengaluru, India</span>
+      <span class="dot">·</span>
+      <a href="https://github.com/Vinaycicdops">github.com/Vinaycicdops</a>
+      <span class="dot">·</span>
+      <a href="https://linkedin.com/in/vinaybkrishna">linkedin.com/in/vinaybkrishna</a>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PROFESSIONAL SUMMARY -->
+  <div class="section">
+    <div class="section-title">Professional Summary</div>
+    <div class="summary">AWS DevOps and SRE Engineer with 3.5+ years of production experience designing self-healing, highly observable Kubernetes platforms. Specialized in high-concurrency environments, GitOps-driven CI/CD, and infrastructure automation. Experienced in AWS security best practices and cost optimization, ready to deliver SRE solutions in a consulting capacity.</div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- TECHNICAL SKILLS -->
+  <div class="section">
+    <div class="section-title">Technical Skills</div>
+    <div class="skills-block"><div class="skill-row"><span class="skill-label">Cloud & Infra</span><span class="skill-value">AWS (EKS, EC2, RDS, VPC, IAM, Route53, ALB/NLB, KMS, ASG), Terraform, Ansible, Vault, Docker</span></div><div class="skill-row"><span class="skill-label">Kubernetes</span><span class="skill-value">EKS, Helm, ArgoCD, HPA/VPA, RBAC, Istio, Kiali, KServe</span></div><div class="skill-row"><span class="skill-label">Observability</span><span class="skill-value">Prometheus, Grafana, Loki, ELK Stack, AlertManager</span></div><div class="skill-row"><span class="skill-label">CI/CD & Security</span><span class="skill-value">GitHub Actions, GitLab CI, GitOps, Trivy, SonarQube, Infracost</span></div><div class="skill-row"><span class="skill-label">Languages</span><span class="skill-value">Python, Bash, Go</span></div></div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- PROFESSIONAL EXPERIENCE -->
+  <div class="section">
+    <div class="section-title">Professional Experience</div>
+    
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title-company">DevOps Engineer<span class="separator">|</span>Volt Security Pvt Ltd</span>
+        <span class="job-date">Dec 2023 – Jan 2026</span>
+      </div>
+      <ul class="job-bullets"><li>Administered production EKS clusters achieving 99.99% uptime, handling 25k+ RPS across critical microservices.</li><li>Automated AWS infrastructure provisioning using Terraform, reducing deployment lead time from days to 10 minutes.</li><li>Built Developer Self-Service pipelines with GitHub Actions, improving deployment speed by 40% while maintaining security and compliance.</li><li>Implemented robust observability (Prometheus/Grafana) and AWS security (IAM/KMS/Secrets Manager) practices.</li><li>Proactively reduced cloud spend by 20% through automated rightsizing and tagging strategies.</li></ul>
+    </div>
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title-company">Software Engineer<span class="separator">|</span>Cognitive Clouds</span>
+        <span class="job-date">Jan 2021 – Aug 2022</span>
+      </div>
+      <ul class="job-bullets"><li>Engineered containerized application deployments (Docker), improving build speeds and image efficiency.</li><li>Built CI/CD pipelines bridging dev and ops, reducing release cycles for 5+ teams.</li></ul>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- PROJECTS -->
+  <div class="section">
+    <div class="section-title">Independent Project</div>
+    
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Dual-Engine MLOps + AIOps Platform</span>
+        <span class="job-date"></span>
+      </div>
+      <a class="project-link" href="https://github.com/Vinaycicdops/project_1">github.com/Vinaycicdops/project_1</a>
+      <ul class="job-bullets"><li>Built a self-healing engine using Isolation Forest and LSTM Autoencoders to monitor 8+ Prometheus metrics with dual-model consensus.</li><li>Designed an end-to-end MLOps pipeline using Kubeflow (KFP v2) with automated retraining triggered by data drift signals (PSI/KS-test).</li><li>Fully declarative infrastructure-as-code deployment for the complete observability and ML stack.</li></ul>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">Education</div>
+    
+    <div class="edu-row">
+      <span><span class="edu-degree">B.E. Computer Science</span><span class="edu-school"> — KSSEM, Bengaluru</span></span>
+      <span class="edu-year">2015 – 2019</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

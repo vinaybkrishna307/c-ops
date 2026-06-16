@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinay B — CV</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    body {
+      font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 9.5px;
+      line-height: 1.4;
+      color: #1a1a1a;
+      background: #ffffff;
+      padding: 0.3in 0.45in 0.25in;
+      margin: 0;
+    }
+
+    .page { width: 100%; max-width: 210mm; margin: 0 auto; }
+
+    .header { margin-bottom: 6px; }
+
+    .header-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #0f0f0f;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+
+    .header-title {
+      font-size: 13px;
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 0.01em;
+      margin-bottom: 5px;
+    }
+
+    .header-contact {
+      font-size: 11px;
+      color: #555;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .header-contact span, .header-contact a { color: #555; text-decoration: none; }
+    .header-contact .dot { margin: 0 5px; color: #999; }
+
+    .divider { border: none; border-top: 1.5px solid #1a1a1a; margin: 5px 0 6px; }
+    .thin-rule { border: none; border-top: 0.75px solid #d0d0d0; margin: 5px 0 6px; }
+
+    .section { margin-bottom: 10px; }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      margin-bottom: 5px;
+    }
+
+    .summary { font-size: 10px; line-height: 1.55; color: #2a2a2a; }
+    .summary strong { font-weight: 700; }
+
+    .skills-block { display: grid; gap: 3px; }
+
+    .skill-row {
+      display: grid;
+      grid-template-columns: 125px 1fr;
+      gap: 8px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      align-items: baseline;
+    }
+
+    .skill-label { font-weight: 600; color: #1a1a1a; }
+    .skill-value { color: #3a3a3a; }
+    .skill-value strong { font-weight: 700; }
+
+    .job { margin-bottom: 10px; break-inside: avoid; page-break-inside: avoid; }
+
+    .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+
+    .job-title-company { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+    .job-title-company .separator { font-weight: 400; color: #666; margin: 0 3px; }
+
+    .job-date { font-size: 10.5px; color: #555; white-space: nowrap; }
+    .job-location { font-size: 10px; color: #888; margin-bottom: 4px; }
+
+    .job-bullets { list-style: none; padding: 0; margin: 0; }
+
+    .job-bullets li {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #2a2a2a;
+      padding-left: 13px;
+      position: relative;
+      margin-bottom: 3px;
+    }
+
+    .job-bullets li::before {
+      content: "▸"; position: absolute; left: 0; color: #888; font-size: 8px; top: 3px;
+    }
+
+    .job-bullets li strong { font-weight: 700; color: #111; }
+
+    .project { break-inside: avoid; page-break-inside: avoid; margin-bottom: 4px; }
+
+    .project-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+    .project-name { font-size: 10.5px; font-weight: 700; color: #1a1a1a; }
+
+    .project-link { font-size: 10px; color: #777; text-decoration: none; display: block; margin-top: 2px; margin-bottom: 4px; }
+
+    .edu-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; }
+    .edu-degree { font-weight: 600; color: #1a1a1a; }
+    .edu-school { font-weight: 400; color: #444; }
+    .edu-year { font-size: 11px; color: #555; white-space: nowrap; }
+
+    @media print {
+      body { padding: 0.35in 0.45in 0.35in 0.45in; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-name">Vinay B</div>
+    <div class="header-title">Senior/Middle DevOps Engineer (Kubernetes & Infrastructure Automation)</div>
+    <div class="header-contact">
+      <a href="mailto:vinaybkrishna10@gmail.com">vinaybkrishna10@gmail.com</a>
+      <span class="dot">·</span>
+      <span>+91 8660953284</span>
+      <span class="dot">·</span>
+      <span>Bengaluru, India</span>
+      <span class="dot">·</span>
+      <a href="https://github.com/Vinaycicdops">github.com/Vinaycicdops</a>
+      <span class="dot">·</span>
+      <a href="https://linkedin.com/in/vinaybkrishna">linkedin.com/in/vinaybkrishna</a>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title">Professional Summary</div>
+    <div class="summary">
+      <strong>Kubernetes Infrastructure Specialist</strong> with 3.5+ years of experience architecting high-scale production platforms and complex CI/CD pipelines. Expert at managing <strong>production-grade K8s clusters handling 25k+ RPS with 99.99% uptime</strong>. Specialized in <strong>Hashicorp Stack (Vault, Consul, Terraform)</strong> for zero-touch provisioning and building internal automation tools using Python and Golang (basic) to optimize global fintech infrastructure.
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <div class="section">
+    <div class="section-title">Technical Skills</div>
+    <div class="skills-block">
+      <div class="skill-row">
+        <div class="skill-label">Kubernetes & Infra</div>
+        <div class="skill-value"><strong>Kubernetes (EKS, Private Cloud)</strong>, <strong>Terraform</strong>, <strong>Vault, Consul</strong>, Helm, Kustomize, Ansible, Networking</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-label">Cloud & Platforms</div>
+        <div class="skill-value">AWS (EC2, RDS, S3, VPC, IAM, KMS), Linux Administration, Docker, Nginx, WAF</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-label">CI/CD & GitOps</div>
+        <div class="skill-value"><strong>ArgoCD</strong>, GitHub Actions, GitLab CI, Jenkins, GitHub Workflows, GitOps</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-label">Automation & Lang</div>
+        <div class="skill-value"><strong>Python</strong>, <strong>Golang (Basic/Operators)</strong>, Bash, YAML, SQL, MLOps Integration</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-label">Observability</div>
+        <div class="skill-value">Prometheus, Grafana, Loki, ELK Stack, New Relic, OpenTelemetry, AlertManager</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <div class="section">
+    <div class="section-title">Professional Experience</div>
+
+    <div class="job">
+      <div class="job-header">
+        <div class="job-title-company">DevOps & Infrastructure Engineer <span class="separator">|</span> Volt Security Pvt Ltd</div>
+        <div class="job-date">Dec 2023 – Jan 2026</div>
+      </div>
+      <div class="job-location">Bengaluru, India</div>
+      <ul class="job-bullets">
+        <li><strong>Architected and managed production-grade Kubernetes infrastructure</strong> handling 25k+ RPS with 99.99% uptime across 8 critical microservices.</li>
+        <li>Implemented secure cloud and on-premise infrastructure using <strong>Terraform, Vault, and Consul</strong> for zero-touch provisioning.</li>
+        <li>Designed Developer Self-Service pipelines with Helm + <strong>ArgoCD</strong>, reducing provisioning time from days to under 10 minutes.</li>
+        <li>Engineered automated remediation loops that reduced MTTR to under 55 minutes via proactive observability (Prometheus/Grafana).</li>
+        <li>Led DevSecOps initiatives including least-privilege IAM and KMS encryption, reducing cloud costs by 20%.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-header">
+        <div class="job-title-company">Software Engineer <span class="separator">|</span> Cognitive Clouds</div>
+        <div class="job-date">Jan 2021 – Aug 2022</div>
+      </div>
+      <div class="job-location">Bengaluru, India</div>
+      <ul class="job-bullets">
+        <li>Engineered multi-stage Dockerfiles reducing image sizes by 60% and improving build performance.</li>
+        <li>Built CI/CD pipelines with GitHub Actions, reducing release cycle time by 20%.</li>
+        <li>Managed deployment workflows bridging dev and ops in an <strong>Agile environment</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <div class="section">
+    <div class="section-title">Projects</div>
+    <div class="project">
+      <div class="project-header">
+        <div class="project-name">Dual-Engine MLOps + AIOps Platform</div>
+      </div>
+      <a href="https://github.com/Vinaycicdops/project_1" class="project-link">github.com/Vinaycicdops/project_1</a>
+      <div class="summary">
+        An <strong>internal automation framework</strong> for ensemble anomaly detection. Features a Python-based trigger loop that orchestrates <strong>Kubeflow Pipelines</strong> for automated remediation, achieving 30s detection-to-remediation latency.
+      </div>
+    </div>
+  </div>
+
+  <hr class="thin-rule">
+
+  <div class="section">
+    <div class="section-title">Education</div>
+    <div class="edu-row">
+      <div>
+        <span class="edu-degree">B.E. Computer Science</span>
+        <span class="dot">·</span>
+        <span class="edu-school">KSSEM, Bengaluru</span>
+      </div>
+      <div class="edu-year">2015 – 2019</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

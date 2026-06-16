@@ -1,0 +1,193 @@
+# =============================================================================
+# TRACKED COMPANIES — appended to portals.yml
+# =============================================================================
+# scan.mjs reads `tracked_companies`. Each entry hits the ATS API directly.
+# Zero Google search, zero Playwright, zero token cost.
+#
+# Usage:
+#   node scan.mjs --dry-run    ← verify loading, check for errors
+#   node scan.mjs              ← live scan → data/pipeline.md
+#
+# STATUS: ✅ slug confirmed   ⚠️ slug inferred (fix if 0 results or 404)
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# LOCATION FILTER
+# ---------------------------------------------------------------------------
+location_filter:
+  always_allow:
+    - "bangalore"
+    - "bengaluru"
+    - "remote"
+    - "india"
+    - "hybrid"
+  block:
+    - "united states"
+    - "new york"
+    - "san francisco"
+    - "london"
+    - "berlin"
+    - "toronto"
+    - "sydney"
+    - "amsterdam"
+    - "singapore"
+    - "dubai"
+    - "germany"
+    - "france"
+    - "canada"
+    - "australia"
+    - "uk"
+    - "united kingdom"
+
+# ---------------------------------------------------------------------------
+# TRACKED COMPANIES
+# ---------------------------------------------------------------------------
+tracked_companies:
+
+  # ── GREENHOUSE ────────────────────────────────────────────────────────────
+
+  - name: Meesho
+    careers_url: https://job-boards.greenhouse.io/meesho         # ✅
+
+  - name: BrowserStack
+    careers_url: https://job-boards.greenhouse.io/browserstack   # ✅
+
+  - name: Freshworks
+    careers_url: https://job-boards.greenhouse.io/freshworks      # ✅
+
+  - name: Razorpay
+    careers_url: https://job-boards.greenhouse.io/razorpay        # ✅
+
+  - name: Groww
+    careers_url: https://job-boards.greenhouse.io/groww           # ✅
+
+  - name: Postman
+    careers_url: https://job-boards.greenhouse.io/postman         # ✅
+
+  - name: Setu
+    careers_url: https://job-boards.greenhouse.io/setu            # ⚠️
+
+  - name: Slice
+    careers_url: https://job-boards.greenhouse.io/slicedotcom     # ⚠️
+
+  - name: Whatfix
+    careers_url: https://job-boards.greenhouse.io/whatfix         # ⚠️
+
+  - name: Druva
+    careers_url: https://job-boards.greenhouse.io/druva           # ⚠️
+
+  - name: Uniphore
+    careers_url: https://job-boards.greenhouse.io/uniphore        # ⚠️
+
+  - name: Chargebee
+    careers_url: https://job-boards.greenhouse.io/chargebee       # ⚠️
+
+  - name: Hasura
+    careers_url: https://job-boards.greenhouse.io/hasura          # ⚠️
+
+  - name: Sprinklr
+    careers_url: https://job-boards.greenhouse.io/sprinklr        # ⚠️
+
+  - name: Leadsquared
+    careers_url: https://job-boards.greenhouse.io/leadsquared     # ⚠️
+
+  # ── LEVER ─────────────────────────────────────────────────────────────────
+
+  - name: Zepto
+    careers_url: https://jobs.lever.co/zepto                      # ✅
+
+  - name: Fi Money                   # entity slug is "epifi" not "fi"
+    careers_url: https://jobs.lever.co/epifi                      # ✅ FIXED
+
+  - name: Jar                        # slug is "jar-app" not "jar"
+    careers_url: https://jobs.lever.co/jar-app                    # ✅ FIXED
+
+  - name: PhonePe
+    careers_url: https://jobs.lever.co/phonepe                    # ⚠️
+
+  - name: Juspay
+    careers_url: https://jobs.lever.co/juspay                     # ⚠️
+
+  - name: Exotel
+    careers_url: https://jobs.lever.co/exotel                     # ⚠️
+
+  - name: Yellow.ai
+    careers_url: https://jobs.lever.co/yellowai                   # ⚠️
+
+  - name: Innovaccer
+    careers_url: https://jobs.lever.co/innovaccer                 # ⚠️
+
+  - name: Darwinbox
+    careers_url: https://jobs.lever.co/darwinbox                  # ⚠️
+
+  - name: Clevertap
+    careers_url: https://jobs.lever.co/clevertap                  # ⚠️
+
+  - name: MoEngage
+    careers_url: https://jobs.lever.co/moengage                   # ⚠️
+
+  - name: Perfios
+    careers_url: https://jobs.lever.co/perfios                    # ⚠️
+
+  # ── ASHBY ─────────────────────────────────────────────────────────────────
+  # ~30s response latency is normal for Ashby (see ashby.mjs comments)
+
+  - name: Sarvam AI                  # slug is "sarvam" not "sarvamai"
+    careers_url: https://jobs.ashbyhq.com/sarvam                  # ✅ FIXED
+
+  - name: Niyo
+    careers_url: https://jobs.ashbyhq.com/niyo                    # ⚠️
+
+  # REMOVED: Krutrim — 3 layoff rounds since June 2025, 200+ exits, hiring frozen
+  # REMOVED: Fi Money — moved to Lever (epifi)
+  # REMOVED: Jar — moved to Lever (jar-app)
+  # TODO: Pixis — verify at https://pixis.ai/careers, update slug below
+  # - name: Pixis
+  #   careers_url: https://jobs.ashbyhq.com/pixis
+  # TODO: Vyapar — verify at https://vyapar.in/careers, update slug below
+  # - name: Vyapar
+  #   careers_url: https://jobs.ashbyhq.com/vyapar
+
+  # ── WORKABLE ──────────────────────────────────────────────────────────────
+
+  - name: Facilio
+    careers_url: https://apply.workable.com/facilio               # ⚠️
+
+  - name: Eightfold AI
+    careers_url: https://apply.workable.com/eightfold             # ⚠️
+
+  - name: Recur Club
+    careers_url: https://apply.workable.com/recurclub             # ⚠️
+
+  # ── SMARTRECRUITERS ───────────────────────────────────────────────────────
+  # Large orgs — title_filter handles the noise
+
+  - name: Swiggy
+    careers_url: https://jobs.smartrecruiters.com/Swiggy          # ✅
+
+  - name: Flipkart
+    careers_url: https://jobs.smartrecruiters.com/Flipkart        # ✅
+
+  - name: Ola
+    careers_url: https://jobs.smartrecruiters.com/OlaCabs         # ⚠️
+
+  - name: BigBasket
+    careers_url: https://jobs.smartrecruiters.com/BigBasket       # ⚠️
+
+  - name: Nykaa
+    careers_url: https://jobs.smartrecruiters.com/Nykaa           # ⚠️
+
+  - name: Urban Company
+    careers_url: https://jobs.smartrecruiters.com/UrbanCompany    # ⚠️
+
+  # ── NOT YET SUPPORTED (needs Playwright provider) ────────────────────────
+  # These companies post on custom domains with no public ATS API.
+  # Uncomment + add a playwright provider to enable.
+  #
+  # - name: CRED
+  #   careers_url: https://cred.club/careers
+  #   enabled: false
+  #
+  # - name: Navi
+  #   careers_url: https://navi.com/careers
+  #   enabled: false
